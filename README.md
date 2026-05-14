@@ -1,6 +1,6 @@
 # Overview
 
-CB-ROS is currently being developed as a Prototype Phase Research Intelligence Platform focused on accelerating catalyst discovery through scientific workflows. The current implementation demonstrates the foundational architecture, intelligent discovery pipeline, and closed-loop learning capabilities of the system.
+CB-ROS is Research Intelligence Platform focused on accelerating catalyst discovery through scientific workflows. The current implementation demonstrates the foundational architecture, intelligent discovery pipeline, and closed-loop learning capabilities of the system.
 
 As part of the long-term vision, several advanced modules are planned for future development phases. The present prototype is designed to validate the core concept, workflow efficiency, adaptive intelligence loop, and real-time collaborative research infrastructure.
 
