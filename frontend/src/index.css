@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  background-color: #06090F;
+  background-image:
+    radial-gradient(1100px 700px at 15% -10%, rgba(34, 211, 238, 0.08), transparent 60%),
+    radial-gradient(900px 600px at 90% 5%, rgba(45, 212, 191, 0.06), transparent 60%),
+    radial-gradient(800px 600px at 50% 100%, rgba(52, 211, 153, 0.04), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Subtle grid overlay */
+.grid-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(91, 107, 138, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 107, 138, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1C2638;
+  border-radius: 8px;
+  border: 2px solid #06090F;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #26324A;
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.6);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Numeric tabular */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Glow text */
+.text-glow-cyan {
+  text-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
+}
+
+/* Card surface */
+.surface {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)) ,
+    #0D131E;
+  border: 1px solid rgba(91, 107, 138, 0.18);
+  border-radius: 14px;
+}
+
+.surface-raised {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0)) ,
+    #111826;
+  border: 1px solid rgba(91, 107, 138, 0.22);
+  border-radius: 14px;
+}
+
+.divider-soft {
+  border-color: rgba(91, 107, 138, 0.18);
+}
+
+/* Confidence/progress bar gradient */
+.bar-cyan {
+  background: linear-gradient(90deg, #06B6D4, #22D3EE);
+}
+.bar-emerald {
+  background: linear-gradient(90deg, #10B981, #34D399);
+}
+.bar-amber {
+  background: linear-gradient(90deg, #B45309, #F59E0B);
+}
+.bar-rose {
+  background: linear-gradient(90deg, #BE123C, #F43F5E);
+}
+
+/* Scan line for placeholders */
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+.scanline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 30%;
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.15), transparent);
+  animation: scan 4.5s linear infinite;
+  pointer-events: none;
+}
