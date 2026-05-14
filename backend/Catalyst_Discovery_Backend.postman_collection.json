@@ -1,0 +1,177 @@
+{
+	"info": {
+		"_postman_id": "c8e1f0a2-3b4c-4d5e-8f9a-1b2c3d4e5f6g",
+		"name": "Catalyst Discovery Backend",
+		"description": "API collection for the Catalyst Discovery & Experiment Feedback system.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Demo",
+			"item": [
+				{
+					"name": "Run Full Lifecycle Demo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/demo",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"demo"
+							]
+						},
+						"description": "Orchestrates a complete lifecycle: Project -> Discovery -> Experiment -> Feedback."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Projects",
+			"item": [
+				{
+					"name": "Create Project",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"CO₂ → Methanol — Cu/Zn pathway\",\n    \"reactants\": \"CO2 + H2\",\n    \"products\": \"CH3OH + H2O\",\n    \"temp\": \"240°C\",\n    \"pressure\": \"50 bar\",\n    \"catalysisType\": \"Metal catalysis\",\n    \"creator\": \"Dr. R. Iyer\",\n    \"sustainabilityTag\": \"Green H2\",\n    \"status\": \"Active\",\n    \"notes\": \"Exploring Cu/Zn catalyst ratios for higher yield.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/projects",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Discovery",
+			"item": [
+				{
+					"name": "Trigger Discovery",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"projectId\": \"PASTE_PROJECT_ID_HERE\",\n    \"conditions\": {\n        \"temperature\": \"300C\",\n        \"pressure\": \"100bar\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/discovery",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"discovery"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Experiments",
+			"item": [
+				{
+					"name": "Submit Experiment Result",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"candidateId\": \"PASTE_CANDIDATE_ID_HERE\",\n    \"predictedScore\": 0.88,\n    \"actualScore\": 0.72\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/experiments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"experiments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Experiment (Triggers Feedback Loop)",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/experiments/PASTE_SUBMISSION_ID_HERE/approve",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"experiments",
+								"PASTE_SUBMISSION_ID_HERE",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

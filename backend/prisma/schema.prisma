@@ -1,0 +1,177 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+model Company {
+  id         String   @id @default(uuid())
+  name       String
+  slug       String   @unique
+  created_at DateTime @default(now())
+
+  users      User[]
+}
+
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  company_id  String
+  company     Company  @relation(fields: [company_id], references: [id])
+  created_at  DateTime @default(now())
+
+  submissions      ExperimentSubmission[] @relation("SubmittedBy")
+  reviews          ExperimentReview[]
+  created_projects Project[]              @relation("ProjectCreator")
+  training_runs    TrainingSnapshot[]     @relation("TrainingTriggeredBy")
+
+  @@index([company_id])
+}
+
+model Project {
+  id               String           @id @default(uuid())
+  name             String
+  reaction_input   String
+  reactants        String?
+  products         String?
+  temp             String?
+  pressure         String?
+  catalysis_type   String?
+  creator_id       String?
+  creator          User?            @relation("ProjectCreator", fields: [creator_id], references: [id])
+  sustainability_tag String?
+  status           String           @default("Active")
+  notes            String?
+  conditions       Json?
+  iterations_used  Int              @default(0) // minor version (resets on edit)
+  max_iterations   Int              @default(3)
+  version_major    Int              @default(1) // bumps on each edit (PATCH)
+  created_at       DateTime         @default(now())
+  candidates       Candidate[]
+  failure_insights FailureInsight[]
+  training_snapshots TrainingSnapshot[]
+}
+
+model Candidate {
+  id                 String           @id @default(uuid())
+  project_id         String
+  project            Project          @relation(fields: [project_id], references: [id])
+  iteration_number   Int              @default(1)
+  formula            String
+  predicted_score    Float
+  confidence         Float
+  // Structured catalyst properties (Step 3/4 spec)
+  stability          Float?
+  activity_score     Float?
+  activation_energy  Float?           // kJ/mol
+  operating_temp     String?          // e.g. "240C"
+  operating_pressure String?          // e.g. "50 bar"
+  source             String?          // "literature" | "third-party-db" | "historical" | "llm"
+  metadata           Json             @default("{}")
+  embedding          Unsupported("vector(768)")?
+  created_at         DateTime         @default(now())
+  experiments        ExperimentSubmission[]
+  calibration_logs   CalibrationLog[]
+
+  @@index([project_id])
+  @@index([project_id, iteration_number])
+  @@index([created_at])
+}
+
+model ExperimentSubmission {
+  id              String           @id @default(uuid())
+  candidate_id    String
+  candidate       Candidate        @relation(fields: [candidate_id], references: [id])
+  submitted_by_id String?
+  submitted_by    User?            @relation("SubmittedBy", fields: [submitted_by_id], references: [id])
+  predicted_score Float
+  actual_score    Float?
+  outcome         String?          // success | failure | partial
+  observations    String?          // free-text scientist notes
+  status          String           @default("pending") // pending, approved, rejected
+  created_at      DateTime         @default(now())
+  reviews         ExperimentReview[]
+
+  @@index([candidate_id])
+  @@index([status])
+  @@index([submitted_by_id])
+}
+
+model ExperimentReview {
+  id              String           @id @default(uuid())
+  submission_id   String
+  submission      ExperimentSubmission @relation(fields: [submission_id], references: [id])
+  reviewer_id     String
+  reviewer        User             @relation(fields: [reviewer_id], references: [id])
+  decision        String           // approve | reject
+  comment         String?
+  created_at      DateTime         @default(now())
+
+  @@unique([submission_id, reviewer_id])
+  @@index([submission_id])
+  @@index([reviewer_id])
+}
+
+model CalibrationLog {
+  id              String           @id @default(uuid())
+  candidate_id    String
+  candidate       Candidate        @relation(fields: [candidate_id], references: [id])
+  predicted_score Float
+  actual_score    Float
+  delta           Float
+  created_at      DateTime         @default(now())
+
+  @@index([candidate_id])
+  @@index([created_at])
+}
+
+model TrainingSnapshot {
+  id                  String   @id @default(uuid())
+  project_id          String
+  project             Project  @relation(fields: [project_id], references: [id])
+  triggered_by_id     String?
+  triggered_by        User?    @relation("TrainingTriggeredBy", fields: [triggered_by_id], references: [id])
+
+  scope               String   @default("project") // "project" | "company"
+
+  experiments_indexed Int      @default(0)
+  approved_count     Int      @default(0)
+  rejected_count     Int      @default(0)
+  changes_requested_count Int @default(0)
+
+  // Calibration: signed bias = mean(predicted - actual). Future predictions
+  // get adjusted by `-bias_correction` so over/under-confidence is dampened.
+  avg_drift_before    Float?
+  avg_drift_after     Float?
+  bias_correction     Float    @default(0)
+
+  // RAG corpus snapshot — array of candidate IDs that were "indexed"
+  // (already have embeddings; this list scopes retrieval at discovery time).
+  metadata            Json     @default("{}")
+
+  created_at          DateTime @default(now())
+
+  @@index([project_id])
+  @@index([created_at])
+  @@index([triggered_by_id])
+}
+
+model FailureInsight {
+  id              String           @id @default(uuid())
+  project_id      String
+  project         Project          @relation(fields: [project_id], references: [id])
+  pattern         String
+  severity        String           @default("medium")
+  created_at      DateTime         @default(now())
+
+  @@index([project_id])
+}
